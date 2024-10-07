@@ -5,11 +5,12 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Form } from '@/components/ui/form';
 import CustomFormField from '../CustomFormField';
-import { FormFieldType } from '@/types';
 import SubmitButton from '../SubmitButton';
 import { useState } from 'react';
 import { UserFormValidation } from '@/lib/validation';
 import { useRouter } from 'next/navigation';
+import { createUser } from '@/lib/actions/patient.action';
+import { FormFieldType } from '@/types';
 
 const PatientForm = () => {
   const router = useRouter();
@@ -26,23 +27,26 @@ const PatientForm = () => {
   });
 
   // 2. Define a submit handler.
-  async function onSubmit({
+  const onSubmit = async ({
     name,
     email,
     phone,
-  }: z.infer<typeof UserFormValidation>) {
+  }: z.infer<typeof UserFormValidation>) => {
     setIsLoading(true);
 
     try {
-      //   const userData = { name, email, phone };
-      //   const user = await createUser(userData);
-      //   if (user) router.push(`/patients/${user.$id}/register`);
+      const userData = { name, email, phone };
+      const user = await createUser(userData);
+      if (user) router.push(`/patients/${user.$id}/register`);
+      else {
+        throw new Error('User created unsuccesfully');
+      }
     } catch (error) {
       console.error(error);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex-1">
