@@ -9,7 +9,7 @@ export enum FormFieldType {
   PHONE_INPUT = 'phoneInput',
   DATE_PICKER = 'datePicker',
   SELECT = 'select',
-  SKELETEON = 'skeleton',
+  SKELETON = 'skeleton',
 }
 
 export type CustomInputProps = {
@@ -26,7 +26,7 @@ export type CustomInputProps = {
   children?: React.ReactNode;
   renderSkeleton?: (field: any) => React.ReactNode;
 };
-export type Gender = 'Male' | 'Female' | 'Other';
+export type Gender = 'male' | 'female' | 'other';
 export type Status = 'pending' | 'scheduled' | 'cancelled';
 
 /* eslint-disable no-unused-vars */
@@ -80,4 +80,9 @@ export type UpdateAppointmentParams = {
   userId: string;
   appointment: Appointment;
   type: string;
+};
+
+export type FileUploaderProps = {
+  files: File[];
+  onChange: (files: File[]) => void;
 };
