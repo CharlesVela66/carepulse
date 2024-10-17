@@ -6,7 +6,6 @@ import Link from 'next/link';
 
 const Home = ({ searchParams }: SearchParamProps) => {
   const isAdmin = searchParams.admin === 'true';
-  console.log(isAdmin);
 
   return (
     <div className="flex h-screen max-h-screen">

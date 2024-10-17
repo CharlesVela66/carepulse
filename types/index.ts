@@ -86,3 +86,10 @@ export type FileUploaderProps = {
   files: File[];
   onChange: (files: File[]) => void;
 };
+
+export interface StatCardProps {
+  type: 'appointments' | 'pending' | 'cancelled';
+  count: number;
+  label: string;
+  icon: string;
+}

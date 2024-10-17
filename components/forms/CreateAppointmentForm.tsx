@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,16 +15,24 @@ import { FormFieldType, Status } from '@/types';
 import { Doctors } from '@/constants';
 import { SelectItem } from '../ui/select';
 import Image from 'next/image';
-import { createAppointment } from '@/lib/actions/appointment.actions';
+import {
+  createAppointment,
+  updateAppointment,
+} from '@/lib/actions/appointment.actions';
+import { Appointment } from '@/types/appwrite.types';
 
 const CreateAppointmentForm = ({
   userId,
   type,
   patientId,
+  appointment,
+  setOpen,
 }: {
   userId: string;
   type: 'create' | 'cancel' | 'schedule';
   patientId: string;
+  appointment?: Appointment;
+  setOpen: (open: boolean) => void;
 }) => {
   let buttonLabel;
 
@@ -49,14 +59,15 @@ const CreateAppointmentForm = ({
   const form = useForm<z.infer<typeof formType>>({
     resolver: zodResolver(formType),
     defaultValues: {
-      primaryPhysician: '',
-      schedule: new Date(),
-      reason: '',
-      note: '',
+      primaryPhysician: appointment ? appointment.primaryPhysician : '',
+      schedule: appointment
+        ? new Date(appointment.schedule)
+        : new Date(Date.now()),
+      reason: appointment && appointment.reason,
+      note: appointment ? appointment.note : '',
       cancellationReason: '',
     },
   });
-  console.log(form.formState.errors);
 
   // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof formType>) => {
@@ -100,6 +111,25 @@ const CreateAppointmentForm = ({
             `/patients/${userId}/new-appointment/success?appointmentId=${appointment.$id}`
           );
         }
+      } else {
+        const appointmentToUpdate = {
+          userId,
+          appointmentId: appointment?.$id!,
+          appointment: {
+            primaryPhysician: values?.primaryPhysician,
+            schedule: new Date(values?.schedule),
+            status: status as Status,
+            cancellationReason: values?.cancellationReason,
+          },
+          type,
+        };
+
+        const updatedAppointment = await updateAppointment(appointmentToUpdate);
+
+        if (updatedAppointment) {
+          setOpen && setOpen(false);
+          form.reset();
+        }
       }
     } catch (error) {
       console.error(error);
@@ -109,17 +139,16 @@ const CreateAppointmentForm = ({
   };
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-10 flex-1"
-      >
-        <section className="space-y-4 ">
-          <h1 className="header">Hey there 👋</h1>
-          <p className="text-dark-700">
-            Request a new appointment in just 10 seconds.
-          </p>
-        </section>
-        {type == 'create' && (
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex-1">
+        {type === 'create' && (
+          <section className="space-y-4 mb-12">
+            <h1 className="header">New Appointment</h1>
+            <p className="text-dark-700">
+              Request a new appointment in just 10 seconds.
+            </p>
+          </section>
+        )}
+        {type !== 'cancel' && (
           <>
             <CustomFormField
               fieldType={FormFieldType.SELECT}
