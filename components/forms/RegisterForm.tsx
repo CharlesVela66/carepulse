@@ -32,12 +32,11 @@ const RegisterForm = ({ user }: { user: User }) => {
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
       ...PatientFormDefaultValues,
-      name: '',
-      email: '',
-      phone: '',
+      name: user ? user.name : '',
+      email: user ? user.email : '',
+      phone: user ? user.phone : '',
     },
   });
-  console.log(form.formState.errors);
 
   // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {

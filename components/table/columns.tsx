@@ -15,7 +15,7 @@ export const columns: ColumnDef<Appointment>[] = [
   },
   {
     accessorKey: 'patient',
-    header: 'Email',
+    header: 'Patient',
     cell: ({ row }) => (
       <p className="text-14-medium">{row.original.patient.name}</p>
     ),
